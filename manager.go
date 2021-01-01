@@ -99,29 +99,6 @@ func (m *Manager) Components() []Component {
 	return components
 }
 
-// InterfaceError AFAIRE.
-func (m *Manager) InterfaceError(c Component) error {
-	return failure.New(nil).
-		Set("name", c.Name()).
-		Set("category", c.Category()).
-		Msg("this component does not implement the interface of its category") /////////////////////////////////////////
-}
-
-// Run AFAIRE.
-func (m *Manager) Run() error {
-	c, err := m.GetComponent(CategoryRunner, true)
-	if err != nil {
-		return err
-	}
-
-	cr, ok := c.(Runner)
-	if !ok {
-		return m.InterfaceError(c) /////////////////////////////////////////////////////////////////////////////////////
-	}
-
-	return cr.Run(m)
-}
-
 // InitializeComponents AFAIRE.
 func (m *Manager) InitializeComponents() error {
 	for _, c := range m.Components() {
@@ -239,6 +216,29 @@ func (m *Manager) BuildComponents() error {
 	}
 
 	return nil
+}
+
+// InterfaceError AFAIRE.
+func (m *Manager) InterfaceError(c Component) error {
+	return failure.New(nil).
+		Set("name", c.Name()).
+		Set("category", c.Category()).
+		Msg("this component does not implement the interface of its category") /////////////////////////////////////////
+}
+
+// Run AFAIRE.
+func (m *Manager) Run() error {
+	c, err := m.GetComponent(CategoryRunner, true)
+	if err != nil {
+		return err
+	}
+
+	cr, ok := c.(Runner)
+	if !ok {
+		return m.InterfaceError(c) /////////////////////////////////////////////////////////////////////////////////////
+	}
+
+	return cr.Run(m)
 }
 
 /*
