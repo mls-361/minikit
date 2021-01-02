@@ -122,7 +122,7 @@ func (m *Manager) CloseComponents() {
 		c := m.closeList[last-i]
 		c.Close()
 
-		if m.appDevel() >= 2 {
+		if m.appDevel() > 1 {
 			fmt.Printf("=== Component: %s ==> CLOSED\n", c.Name()) //:::::::::::::::::::::::::::::::::::::::::::::::::::
 		}
 	}
@@ -131,7 +131,7 @@ func (m *Manager) CloseComponents() {
 func (m *Manager) recursiveBuild(snitch map[string]bool, c Component) error {
 	snitch[c.Category()] = false
 
-	if m.appDevel() >= 2 {
+	if m.appDevel() > 1 {
 		fmt.Printf("=== Component: %s ==> TO BUILD\n", c.Name()) //:::::::::::::::::::::::::::::::::::::::::::::::::::::
 	}
 
@@ -169,7 +169,7 @@ func (m *Manager) recursiveBuild(snitch map[string]bool, c Component) error {
 	m.closeList = append(m.closeList, c)
 	snitch[c.Category()] = true
 
-	if m.appDevel() >= 2 {
+	if m.appDevel() > 1 {
 		fmt.Printf("=== Component: %s ==> BUILT\n", c.Name()) //::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	}
 
