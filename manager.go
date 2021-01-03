@@ -20,7 +20,7 @@ const (
 type (
 	// Application AFAIRE.
 	Application interface {
-		Devel() int
+		Debug() int
 	}
 
 	// Manager AFAIRE.
@@ -45,12 +45,12 @@ func NewManager(application Application) *Manager {
 	}
 }
 
-func (m *Manager) appDevel() int {
+func (m *Manager) appDebug() int {
 	if m.application == nil {
 		return -1
 	}
 
-	return m.application.Devel()
+	return m.application.Debug()
 }
 
 // AddComponents AFAIRE.
@@ -122,7 +122,7 @@ func (m *Manager) CloseComponents() {
 		c := m.closeList[last-i]
 		c.Close()
 
-		if m.appDevel() > 1 {
+		if m.appDebug() > 1 {
 			fmt.Printf("=== Component: %s ==> CLOSED\n", c.Name()) //:::::::::::::::::::::::::::::::::::::::::::::::::::
 		}
 	}
@@ -131,7 +131,7 @@ func (m *Manager) CloseComponents() {
 func (m *Manager) recursiveBuild(snitch map[string]bool, c Component) error {
 	snitch[c.Category()] = false
 
-	if m.appDevel() > 1 {
+	if m.appDebug() > 1 {
 		fmt.Printf("=== Component: %s ==> TO BUILD\n", c.Name()) //:::::::::::::::::::::::::::::::::::::::::::::::::::::
 	}
 
@@ -169,7 +169,7 @@ func (m *Manager) recursiveBuild(snitch map[string]bool, c Component) error {
 	m.closeList = append(m.closeList, c)
 	snitch[c.Category()] = true
 
-	if m.appDevel() > 1 {
+	if m.appDebug() > 1 {
 		fmt.Printf("=== Component: %s ==> BUILT\n", c.Name()) //::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 	}
 
