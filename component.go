@@ -6,6 +6,8 @@
 
 package minikit
 
+import "flag"
+
 type (
 	// Component AFAIRE.
 	Component interface {
@@ -13,6 +15,7 @@ type (
 		Category() string
 		Dependencies() []string
 		IsBuilt() bool
+		Configure(fs *flag.FlagSet)
 		Initialize(m *Manager) error
 		Build(m *Manager) error
 		Close()
