@@ -62,6 +62,9 @@ func (cb *Base) IsBuilt() bool {
 	return cb.built
 }
 
+// Configure AFAIRE.
+func (cb *Base) Configure(_ *flag.FlagSet) {}
+
 // Initialize AFAIRE.
 func (cb *Base) Initialize(_ *Manager) error {
 	return nil
