@@ -11,7 +11,7 @@ import "flag"
 type (
 	// Component AFAIRE.
 	Component interface {
-		Name() string
+		Description() string
 		Category() string
 		Dependencies() []string
 		IsBuilt() bool
@@ -23,23 +23,23 @@ type (
 
 	// Base AFAIRE.
 	Base struct {
-		name     string
-		category string
-		built    bool
+		description string
+		category    string
+		built       bool
 	}
 )
 
 // NewBase AFAIRE.
-func NewBase(name, category string) *Base {
+func NewBase(description, category string) *Base {
 	return &Base{
-		name:     name,
-		category: category,
+		description: description,
+		category:    category,
 	}
 }
 
 // Name AFAIRE.
-func (cb *Base) Name() string {
-	return cb.name
+func (cb *Base) Description() string {
+	return cb.description
 }
 
 // Category AFAIRE.

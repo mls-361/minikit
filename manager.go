@@ -8,6 +8,8 @@ package minikit
 
 import (
 	"fmt"
+	"path/filepath"
+	"plugin"
 
 	"github.com/mls-361/failure"
 )
@@ -20,6 +22,7 @@ const (
 type (
 	// Application AFAIRE.
 	Application interface {
+		Name() string
 		Debug() int
 	}
 
@@ -29,6 +32,9 @@ type (
 		components  map[string]Component
 		closeList   []Component
 	}
+
+	// PluginCb AFAIRE.
+	PluginCb func(m *Manager, s plugin.Symbol) error
 
 	// Runner AFAIRE.
 	Runner interface {
@@ -62,11 +68,42 @@ func (m *Manager) AddComponents(cList ...Component) error {
 		if ok {
 			return failure.New(nil).
 				Set("category", category).
-				Set("component", d.Name()).
+				Set("component", d.Description()).
 				Msg("a component of this category already exists") /////////////////////////////////////////////////////
 		}
 
 		m.components[category] = c
+	}
+
+	return nil
+}
+
+// AddPlugin AFAIRE.
+func (m *Manager) AddPlugin(path, symName string, callback PluginCb) error {
+	p, err := plugin.Open(path)
+	if err != nil {
+		return err
+	}
+
+	s, err := p.Lookup(symName)
+	if err != nil {
+		return err
+	}
+
+	return callback(m, s)
+}
+
+// AddPlugins AFAIRE.
+func (m *Manager) AddPlugins(dirname, symName string, callback PluginCb) error {
+	paths, err := filepath.Glob(filepath.Join(dirname, fmt.Sprintf("%s.*.so", m.application.Name())))
+	if err != nil {
+		return err
+	}
+
+	for _, path := range paths {
+		if err := m.AddPlugin(path, symName, callback); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -107,7 +144,7 @@ func (m *Manager) InitializeComponents() error {
 		}
 
 		if err := c.Initialize(m); err != nil {
-			return failure.New(err).Set("component", c.Name()).Msg("initialization error") /////////////////////////////
+			return failure.New(err).Set("component", c.Description()).Msg("initialization error") //////////////////////
 		}
 	}
 
@@ -123,7 +160,7 @@ func (m *Manager) CloseComponents() {
 		c.Close()
 
 		if m.appDebug() > 1 {
-			fmt.Printf("=== Component: %s ==> CLOSED\n", c.Name()) //:::::::::::::::::::::::::::::::::::::::::::::::::::
+			fmt.Printf("=== Component: %s ==> CLOSED\n", c.Description()) //::::::::::::::::::::::::::::::::::::::::::::
 		}
 	}
 }
@@ -132,7 +169,7 @@ func (m *Manager) recursiveBuild(snitch map[string]bool, c Component) error {
 	snitch[c.Category()] = false
 
 	if m.appDebug() > 1 {
-		fmt.Printf("=== Component: %s ==> TO BUILD\n", c.Name()) //:::::::::::::::::::::::::::::::::::::::::::::::::::::
+		fmt.Printf("=== Component: %s ==> TO BUILD\n", c.Description()) //::::::::::::::::::::::::::::::::::::::::::::::
 	}
 
 	for _, cc := range c.Dependencies() {
@@ -152,8 +189,8 @@ func (m *Manager) recursiveBuild(snitch map[string]bool, c Component) error {
 			}
 
 			return failure.New(nil).
-				Set("component1", c.Name()).
-				Set("component2", d.Name()).
+				Set("component1", c.Description()).
+				Set("component2", d.Description()).
 				Msg("these two components are interdependent") /////////////////////////////////////////////////////////
 		}
 
@@ -163,14 +200,14 @@ func (m *Manager) recursiveBuild(snitch map[string]bool, c Component) error {
 	}
 
 	if err := c.Build(m); err != nil {
-		return failure.New(err).Set("component", c.Name()).Msg("build error") //////////////////////////////////////////
+		return failure.New(err).Set("component", c.Description()).Msg("build error") ///////////////////////////////////
 	}
 
 	m.closeList = append(m.closeList, c)
 	snitch[c.Category()] = true
 
 	if m.appDebug() > 1 {
-		fmt.Printf("=== Component: %s ==> BUILT\n", c.Name()) //::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+		fmt.Printf("=== Component: %s ==> BUILT\n", c.Description()) //:::::::::::::::::::::::::::::::::::::::::::::::::
 	}
 
 	return nil
@@ -203,7 +240,7 @@ func (m *Manager) BuildComponents() error {
 		if ok {
 			if !done {
 				return failure.New(nil).
-					Set("component", c.Name()).
+					Set("component", c.Description()).
 					Msg("this error should not occur") /////////////////////////////////////////////////////////////////
 			}
 
@@ -221,7 +258,7 @@ func (m *Manager) BuildComponents() error {
 // InterfaceError AFAIRE.
 func (m *Manager) InterfaceError(c Component) error {
 	return failure.New(nil).
-		Set("name", c.Name()).
+		Set("name", c.Description()).
 		Set("category", c.Category()).
 		Msg("this component does not implement the interface of its category") /////////////////////////////////////////
 }
