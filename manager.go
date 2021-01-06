@@ -95,7 +95,13 @@ func (m *Manager) AddPlugin(path, symName string, callback PluginCb) error {
 			Msg("this plugin does not export this symbol") /////////////////////////////////////////////////////////////
 	}
 
-	return callback(pSym)
+	if err := callback(pSym); err != nil {
+		return failure.New(err).
+			Set("plugin", path).
+			Msg("plugin error") ////////////////////////////////////////////////////////////////////////////////////////
+	}
+
+	return nil
 }
 
 // AddPlugins AFAIRE.
