@@ -95,7 +95,7 @@ func (m *Manager) AddPlugin(path, symName string, callback PluginCb) error {
 
 // AddPlugins AFAIRE.
 func (m *Manager) AddPlugins(dirname, symName string, callback PluginCb) error {
-	paths, err := filepath.Glob(filepath.Join(dirname, fmt.Sprintf("%s.*.so", m.application.Name())))
+	paths, err := filepath.Glob(filepath.Join(dirname, fmt.Sprintf("%s-*.so", m.application.Name())))
 	if err != nil {
 		return err
 	}
