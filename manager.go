@@ -34,7 +34,7 @@ type (
 	}
 
 	// PluginCb AFAIRE.
-	PluginCb func(m *Manager, s plugin.Symbol) error
+	PluginCb func(pSym plugin.Symbol) error
 
 	// Runner AFAIRE.
 	Runner interface {
@@ -82,15 +82,20 @@ func (m *Manager) AddComponents(cList ...Component) error {
 func (m *Manager) AddPlugin(path, symName string, callback PluginCb) error {
 	p, err := plugin.Open(path)
 	if err != nil {
-		return err
+		return failure.New(err).
+			Set("plugin", path).
+			Msg("impossible to open this plugin") //////////////////////////////////////////////////////////////////////
 	}
 
-	s, err := p.Lookup(symName)
+	pSym, err := p.Lookup(symName)
 	if err != nil {
-		return err
+		return failure.New(err).
+			Set("plugin", path).
+			Set("symbol", symName).
+			Msg("this plugin does not export this symbol") /////////////////////////////////////////////////////////////
 	}
 
-	return callback(m, s)
+	return callback(pSym)
 }
 
 // AddPlugins AFAIRE.
