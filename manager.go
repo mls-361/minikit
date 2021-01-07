@@ -214,6 +214,8 @@ func (m *Manager) recursiveBuild(snitch map[string]bool, c Component) error {
 		return failure.New(err).Set("component", c.Description()).Msg("build error") ///////////////////////////////////
 	}
 
+	c.Built()
+
 	m.closeList = append(m.closeList, c)
 	snitch[c.Category()] = true
 

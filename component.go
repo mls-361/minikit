@@ -14,10 +14,11 @@ type (
 		Description() string
 		Category() string
 		Dependencies() []string
-		IsBuilt() bool
 		Configure(fs *flag.FlagSet)
 		Initialize(m *Manager) error
+		IsBuilt() bool
 		Build(m *Manager) error
+		Built()
 		Close()
 	}
 
@@ -52,16 +53,6 @@ func (cb *Base) Dependencies() []string {
 	return []string{}
 }
 
-// Built AFAIRE.
-func (cb *Base) Built() {
-	cb.built = true
-}
-
-// IsBuilt AFAIRE.
-func (cb *Base) IsBuilt() bool {
-	return cb.built
-}
-
 // Configure AFAIRE.
 func (cb *Base) Configure(_ *flag.FlagSet) {}
 
@@ -70,10 +61,19 @@ func (cb *Base) Initialize(_ *Manager) error {
 	return nil
 }
 
+// IsBuilt AFAIRE.
+func (cb *Base) IsBuilt() bool {
+	return cb.built
+}
+
 // Build AFAIRE.
 func (cb *Base) Build(_ *Manager) error {
-	cb.Built()
 	return nil
+}
+
+// Built AFAIRE.
+func (cb *Base) Built() {
+	cb.built = true
 }
 
 // Close AFAIRE.
