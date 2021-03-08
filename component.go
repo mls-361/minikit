@@ -11,8 +11,8 @@ import "flag"
 type (
 	// Component AFAIRE.
 	Component interface {
-		Description() string
 		Category() string
+		Description() string
 		Dependencies() []string
 		Configure(fs *flag.FlagSet)
 		Initialize(m *Manager) error
@@ -24,28 +24,32 @@ type (
 
 	// Base AFAIRE.
 	Base struct {
-		description string
 		category    string
+		description string
 		built       bool
 	}
 )
 
 // NewBase AFAIRE.
-func NewBase(description, category string) *Base {
-	return &Base{
-		description: description,
-		category:    category,
+func NewBase(category, description string) *Base {
+	if description == "" {
+		description = category
 	}
-}
 
-// Name AFAIRE.
-func (cb *Base) Description() string {
-	return cb.description
+	return &Base{
+		category:    category,
+		description: description,
+	}
 }
 
 // Category AFAIRE.
 func (cb *Base) Category() string {
 	return cb.category
+}
+
+// Description AFAIRE.
+func (cb *Base) Description() string {
+	return cb.description
 }
 
 // Dependencies AFAIRE.
